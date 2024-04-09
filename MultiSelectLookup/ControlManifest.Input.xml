@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="ktcs" constructor="MultiSelectLookup" version="0.0.1" display-name-key="MultiSelectLookup" description-key="MultiSelectLookup description" control-type="virtual" >
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <data-set name="dataset" display-name-key="dataset">
+    </data-set>
+    <property name="relationship" display-name-key="Relationship Name" description-key="(required) schemaname of the N:N relationship" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="allowAddNew" display-name-key="Allow Add New" description-key="(boolean) when True, adds an Add New button to the combobox dropdown" of-type="TwoOptions" usage="input" required="true" />
+    <property name="label" display-name-key="Label" description-key="(optional) display label for the lookup control (use this when the control is more than 33% of form width to avoid a visible horizontal divider)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="labelLocation" display-name-key="Label Location" description-key="(optional) if using the in-control label, where to place the label" of-type="Enum" usage="input" required="false">
+      <value name="Above" display-name-key="Yes">0</value>
+      <value name="Beside" display-name-key="No">1</value>
+    </property>
+    <property name="customFilter" display-name-key="Custom OData Filter" description-key="(optional) when searching for related records, use this odata $Filter expression to limit the searchable records (e.g. `statecode eq 0 and new_mycolumn eq false`)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="labelMaxWidth" display-name-key="Label Max Width" description-key="(optional, default: 140px) sets a max width to the label display. Label display widths are variable, depending on deployed release of platform and region, so use this parameter to tweak widths if it does not align with your existing columns." of-type="SingleLine.Text" usage="input" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <platform-library name="React" version="16.8.6" />
+      <platform-library name="Fluent" version="8.29.0" />
+      <platform-library name="Fluent" version="9.4.0" />
+    </resources>
+    <feature-usage>
+      <uses-feature name="Utility" required="true" />
+      <uses-feature name="WebAPI" required="true" />
+    </feature-usage>
+  </control>
+</manifest>
