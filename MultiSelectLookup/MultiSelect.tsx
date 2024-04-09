@@ -358,7 +358,8 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
             </Field>
           )}
           {selectedOptions.length ? (
-            <div style={{background: "#F5F5F5", borderRadius:"5px", width: "100%", height: "auto", alignItems:"center"}} className={styles.leftlabel}>
+            // testing future consolidation of tags and search box
+            // <div style={{background: "#F5F5F5", borderRadius:"5px", width: "100%", height: "auto", alignItems:"center"}} className={styles.leftlabel}>
               <ul id={selectedListId} className={styles.tagsList} >
                 {/* The "Remove" span is used for naming the buttons without affecting the Combobox name */}
                 <span id={`${comboId}-remove`} hidden>
@@ -393,8 +394,9 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
                   </li>
                 ))}
               </ul>
-              <GlobeSearchRegular style={{height: "20px", width: "20px", flexShrink: 0, color: "#616161", paddingRight: "8px"}}/>
-            </div>
+              // testing future consolidation of tags and search box
+              // <GlobeSearchRegular style={{height: "20px", width: "20px", flexShrink: 0, color: "#616161", paddingRight: "8px"}}/>
+            // </div>
           ) : null}
         </div>
       </div>
