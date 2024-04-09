@@ -3,7 +3,7 @@
 This repo contains the working code for replacing a N:N subgrid with a convincing Model Driven App Multi-Select Lookup experience. It relies heavily on Fluent UI React V9 to create a convincing "new look and feel" user experience, and lists selected tags in a grouping beneath the lookup control.
 
 ## Usage
-Build the control and import to your solution, or optionally just import the [solution.zip](/solution/solution.zip) file to your environment to get started right away.
+Build the control and import to your solution, or optionally just import the [solution.zip](/Solution/Solution.zip) file to your environment to get started right away.
 
 The control provides for several configuration parameters. Some of them may be a bit surprising, but remember: we are replacing a _subgrid_ to make it look like a _field_ so some seemingly obvious elements need to be configured.
 
