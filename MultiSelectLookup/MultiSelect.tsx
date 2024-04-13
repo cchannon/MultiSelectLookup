@@ -36,6 +36,8 @@ export interface IMultiSelectProps {
   relationshipName: string;
   labelLocation: "above" | "left";
   labelMaxWidth: string;
+  searchMode: "simple" | "advanced";
+  filter: string | null;
 }
 
 const useStyles = makeStyles({
@@ -69,23 +71,21 @@ const useStyles = makeStyles({
   },
 });
 
-// save for future use
+const useDebounce = (value: any, delay: any) => {
+  const [debouncedValue, setDebouncedValue] = React.useState(value);
 
-// const useDebounce = (value: any, delay: any) => {
-//   const [debouncedValue, setDebouncedValue] = React.useState(value);
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
 
-//   React.useEffect(() => {
-//     const handler = setTimeout(() => {
-//       setDebouncedValue(value);
-//     }, delay);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
-//     return () => {
-//       clearTimeout(handler);
-//     };
-//   }, [value, delay]);
-
-//   return debouncedValue;
-// };
+  return debouncedValue;
+};
 
 export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
   props: IMultiSelectProps
@@ -101,17 +101,16 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
 
   //state for the combobox
   const [hasFocus, setHasFocus] = React.useState<boolean>(false);
-  const [options, setOptions] = React.useState<
-    ComponentFramework.WebApi.Entity[]
-  >([]);
+  const [options, setOptions] = React.useState<ComponentFramework.WebApi.Entity[]>([]);
   const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
   const [addNew, setAddNew] = React.useState<boolean>(false);
   const [progressBar, setProgressBar] = React.useState<boolean>(false);
   const [labelMax, setLabelMax] = React.useState<string>("140px");
+  const [inputValue, setInputValue] = React.useState<string>("");
 
   const comboboxRef = React.useRef<HTMLInputElement | null>(null);
   // save for future use
-  //const debouncedSearchTerm = useDebounce(inputValue, 500); // 500ms delay
+  const debouncedSearchTerm = useDebounce(inputValue, 500); // 500ms delay
   const comboId = useId("Multiselect-Search");
   const selectedListId = `${comboId}-selection`;
   const styles = useStyles();
@@ -122,7 +121,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
     props.webApi
       .retrieveMultipleRecords(
         props.items.getTargetEntityType(),
-        `?$select=${targetPrimaryColumn},${props.items.getTargetEntityType()}id&$filter=(statecode eq 0)`
+        `?$select=${targetPrimaryColumn},${props.items.getTargetEntityType()}id${props.filter?'&'.concat(props.filter):""}`
       )
       .then(
         (response) => {
@@ -166,13 +165,11 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
     }
   }, [props.items, targetPrimaryColumn]);
 
-  //save for future use
-
-  // React.useEffect(() => {
-  //   if (debouncedSearchTerm) {
-  //     //SEARCH STUFF
-  //   }
-  // }, [debouncedSearchTerm]);
+  React.useEffect(() => {
+    if (debouncedSearchTerm) {
+      //SEARCH STUFF
+    }
+  }, [debouncedSearchTerm]);
 
   React.useEffect(() => {
     if (addNew) {
@@ -307,11 +304,9 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
             onBlur={(_e) => {
               setHasFocus(false);
             }}
-            // save for future controlled combobox use (dataverse search)
-
-            // onInput={(ev: React.ChangeEvent<HTMLInputElement>) => {
-            //   setInputValue(ev.target.value);
-            // }}
+            onInput={(ev: React.ChangeEvent<HTMLInputElement>) => {
+              setInputValue(ev.target.value);
+            }}
             onOptionSelect={(_event, data) => {
               onSelectItems(data.selectedOptions);
             }}

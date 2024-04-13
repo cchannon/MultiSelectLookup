@@ -36,6 +36,8 @@ export class MultiSelectLookup implements ComponentFramework.ReactControl<IInput
             relationshipName: context.parameters.relationship.raw!,
             labelLocation: context.parameters.labelLocation.raw === "0" ? "above" : "left",
             labelMaxWidth: context.parameters.labelMaxWidth.raw??"",
+            searchMode: "simple",
+            filter: context.parameters.customFilter.raw,
          };
         return React.createElement(
             MultiselectWithTags, props

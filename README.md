@@ -16,7 +16,7 @@ The control provides for several configuration parameters. Some of them may be a
 - Label (optional): This allows you to insert your own label value. Subgrid labels are slightly larger and semibold, so to keep a uniform look and feel, this option allows you to insert a more "field-like" label.
 - Label Location (optional): This allows you to designate the custom label (if provided in the param above) as appearing above the field or beside it.
 - Label max width (optional): This parameter allows you to set a max width to the label space. Useful for custom labels, in the "beside" position. Dataverse MDAs use different label widths for different column sizing and aspect ratios. Configure this in "px" or "%" to fit your form layout.
-- Custom OData Filter (not yet functional): This parameter is planned for a future capability to allow configuration of custom filters on the lookup experience.
+- Custom OData Filter: This parameter allows injection of a custom odata filter expression to narrow the possible options (e.g. "?filter=(statecode eq 0)").
 
  ## Limitations
  As currently released, this control takes a very simplistic approach to search, retrieving a 'Top 5000' and performing filtering in memory on the client machine. This initial release is about getting the user experience right, and future releases will provide more robust, large-table search versatility. In the meantime, use of this control should be limited to tables with fewer than 5k rows.
