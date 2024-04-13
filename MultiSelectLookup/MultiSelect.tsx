@@ -19,6 +19,8 @@ import {
   GlobeSearchRegular,
   AddRegular,
 } from "@fluentui/react-icons";
+import { useDebounce } from "./Debouncer";
+import { AdvancedSearchProvider, SimpleSearchProvider, SearchProvider } from "./SearchProvider";
 
 export interface IMultiSelectProps {
   thisTableName: string;
@@ -35,9 +37,12 @@ export interface IMultiSelectProps {
   label: string | null;
   relationshipName: string;
   labelLocation: "above" | "left";
-  labelMaxWidth: string;
-  searchMode: "simple" | "advanced";
+  labelWidth: string | null;
   filter: string | null;
+  bestEffort: boolean;
+  searchMode: "simple" | "advanced";
+  matchWords: "all" | "any";
+  searchColumns: string;
 }
 
 const useStyles = makeStyles({
@@ -71,70 +76,80 @@ const useStyles = makeStyles({
   },
 });
 
-const useDebounce = (value: any, delay: any) => {
-  const [debouncedValue, setDebouncedValue] = React.useState(value);
-
-  React.useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
-
 export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
   props: IMultiSelectProps
 ) => {
-  //state for the metadata
+
+  // #region State and Variables
   const [thisSetName, setThisSetName] = React.useState<string>("");
   const [targetSetName, setTargetSetName] = React.useState<string>("");
-  const [targetPrimaryColumn, setTargetPrimaryColumn] =
-    React.useState<string>("");
-  const [targetCollectionName, setTargetCollectionName] =
-    React.useState<string>("");
+  const [targetPrimaryColumn, setTargetPrimaryColumn] = React.useState<string>("");
+  const [targetCollectionName, setTargetCollectionName] = React.useState<string>("");
   const [targetDisplayName, setTargetDisplayName] = React.useState<string>("");
-
-  //state for the combobox
   const [hasFocus, setHasFocus] = React.useState<boolean>(false);
   const [options, setOptions] = React.useState<ComponentFramework.WebApi.Entity[]>([]);
   const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
   const [addNew, setAddNew] = React.useState<boolean>(false);
   const [progressBar, setProgressBar] = React.useState<boolean>(false);
-  const [labelMax, setLabelMax] = React.useState<string>("140px");
   const [inputValue, setInputValue] = React.useState<string>("");
+  const [searchProvider, setSearchProvider] = React.useState<SearchProvider>();
+  const [simpleSearchTerm, setSimpleSearchTerm] = React.useState<string>("");
 
   const comboboxRef = React.useRef<HTMLInputElement | null>(null);
-  // save for future use
-  const debouncedSearchTerm = useDebounce(inputValue, 500); // 500ms delay
+  const debouncedSearchTerm = useDebounce(inputValue, 400); // 500ms delay
   const comboId = useId("Multiselect-Search");
   const selectedListId = `${comboId}-selection`;
   const styles = useStyles();
+  // #endregion
 
+  // init search provider
   React.useEffect(() => {
-    if(targetPrimaryColumn === "") return;
-    // TODO: get better filtering in here
-    props.webApi
-      .retrieveMultipleRecords(
-        props.items.getTargetEntityType(),
-        `?$select=${targetPrimaryColumn},${props.items.getTargetEntityType()}id${props.filter?'&'.concat(props.filter):""}`
-      )
-      .then(
-        (response) => {
-          setOptions(response.entities);
-        },
-        (error) => {
-          console.error(error);
-        }
+    if(props.searchMode === "advanced" && props.webApi && props.items && props.clientURL) {
+      setSearchProvider(new AdvancedSearchProvider(
+        props.webApi, 
+        props.items.getTargetEntityType(), 
+        targetPrimaryColumn, 
+        props.filter, 
+        props.searchColumns.length > 0 ? props.searchColumns.split(",") : [], 
+        props.bestEffort, 
+        props.matchWords, 
+        props.clientURL
+      ));
+    } else if(props.searchMode === "simple" && props.webApi && props.items && props.clientURL && targetPrimaryColumn) {
+      setSearchProvider(new SimpleSearchProvider(
+        props.webApi, 
+        props.items.getTargetEntityType(), 
+        targetPrimaryColumn, 
+        props.filter)
       );
-  }, [targetPrimaryColumn]);
+    }
+  }, [props.searchMode, 
+      props.webApi, 
+      props.items, 
+      targetPrimaryColumn, 
+      props.filter, 
+      props.searchColumns, 
+      props.bestEffort, 
+      props.matchWords,
+      props.searchMode, 
+      props.clientURL
+    ]
+  );
 
+  // Get initial record set
   React.useEffect(() => {
-    //get the primarycolumn, OTC, and setName from metadata query
+    let search = async () => {
+      searchProvider?.initialResults().then((results) => {
+        setOptions(results);
+      }, (error) => {
+        console.error(error)
+      });
+    }
+    search();
+  }, [searchProvider]);
+
+  // Metadata Queries
+  React.useEffect(() => {
     if (props.items) {
       props.utils
         .getEntityMetadata(props.items.getTargetEntityType())
@@ -155,6 +170,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
     }
   }, [props.thisTableName]);
 
+  // default selected options
   React.useEffect(() => {
     if (props.items.sortedRecordIds.length > 0 && targetPrimaryColumn !== "") {
       setSelectedOptions(
@@ -165,39 +181,36 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
     }
   }, [props.items, targetPrimaryColumn]);
 
+  // input capture - Advanced
   React.useEffect(() => {
+    let search = async () => {
+      searchProvider?.search(debouncedSearchTerm).then((results) => {
+        setOptions(results);
+      },
+      (error) => {
+        console.error(error);
+      });
+    };
+
     if (debouncedSearchTerm) {
-      //SEARCH STUFF
+      search();
     }
   }, [debouncedSearchTerm]);
 
+  // input capture - Simple
   React.useEffect(() => {
-    if (addNew) {
-      if (comboboxRef.current) {
-        comboboxRef.current.blur();
-      }
-      // document.getElementById("DS-Search-Combo")?.focus();
-      // document.getElementById("DS-Search-Combo")?.blur();
-      props.addNewCallback();
-      setAddNew(false);
-    }
-  }, [addNew]);
+    let search = async () => {
+      searchProvider?.search(simpleSearchTerm).then((results) => {
+        setOptions(results);
+      },
+      (error) => {
+        console.error(error);
+      });
+    };
+    search();
+  }, [simpleSearchTerm]);
 
-  const onClickPrimary = (option: string) => {
-    props.navigateToRecord(
-      props.items.getTargetEntityType(),
-      props.items.sortedRecordIds.find(
-        (id) =>
-          props.items.records[id].getFormattedValue(targetPrimaryColumn) ===
-          option
-      )!
-    );
-  };
-
-  const onClickClose = (option: string) => {
-    onSelectItems(selectedOptions.filter((opt) => opt !== option));
-  };
-
+  // Item Selection
   const onSelectItems = (items: string[]) => {
     let newOptions: string[] = [];
     let removedOptions: string[] = [];
@@ -214,8 +227,6 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
       removedOptions = selectedOptions;
       setProgressBar(true);
     }
-
-    setSelectedOptions(items);
 
     newOptions.map((opt) => {
       let id = options.find((option) => {
@@ -266,17 +277,42 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
     });
   };
 
+  // post-selection cleanup
   const cleanup = (items: string[] | undefined) => {
     setSelectedOptions(items ?? []);
     setProgressBar(false);
   };
-  
+
+  // fire AddNew callback
   React.useEffect(() => {
-    if(props.labelMaxWidth !== "")
-    {
-      setLabelMax(props.labelMaxWidth);
+    if (addNew) {
+      //TODO: find a cleaner way to drop focus on AddNew: Combobox can sometimes overlay the QuickCreate panel for a second
+      if (comboboxRef.current) {
+        comboboxRef.current.blur();
+      }
+      // document.getElementById("DS-Search-Combo")?.focus();
+      // document.getElementById("DS-Search-Combo")?.blur();
+      props.addNewCallback();
+      setAddNew(false);
     }
-  }, [props.labelMaxWidth]);
+  }, [addNew]);
+
+  // navigate to record on tag primary click
+  const onClickPrimary = (option: string) => {
+    props.navigateToRecord(
+      props.items.getTargetEntityType(),
+      props.items.sortedRecordIds.find(
+        (id) =>
+          props.items.records[id].getFormattedValue(targetPrimaryColumn) ===
+          option
+      )!
+    );
+  };
+
+  // disassociate record on tag close click
+  const onClickClose = (option: string) => {
+    onSelectItems(selectedOptions.filter((opt) => opt !== option));
+  };
 
   return (
     <FluentProvider theme={props.theme} style={{ width: "100%" }}>
@@ -285,7 +321,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
           props.labelLocation === "above" ? styles.root : styles.leftlabel
         }
       >
-        <Label style={{ width: labelMax, paddingTop: "5px" }}>
+        <Label style={{ width: props.labelWidth ?? "140px", paddingTop: "5px" }}>
           {props.label}
         </Label>
         <div className={styles.root} style={{width: "320px"}}>
@@ -304,16 +340,16 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
             onBlur={(_e) => {
               setHasFocus(false);
             }}
-            onInput={(ev: React.ChangeEvent<HTMLInputElement>) => {
-              setInputValue(ev.target.value);
-            }}
+            onInput={
+              (ev: React.ChangeEvent<HTMLInputElement>) => {
+                props.searchMode === "advanced" ?
+                  setInputValue(ev.target.value) : 
+                  setSimpleSearchTerm(ev.target.value)
+              }
+            }
             onOptionSelect={(_event, data) => {
               onSelectItems(data.selectedOptions);
             }}
-            onSelect={() => {
-              console.log("Selected");
-            }}
-            onInputCapture={() => console.log("input capture")}
             type="search"
           >
             {targetCollectionName && (

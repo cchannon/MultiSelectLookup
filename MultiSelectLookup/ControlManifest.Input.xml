@@ -12,8 +12,17 @@
       <value name="Above" display-name-key="Yes">0</value>
       <value name="Beside" display-name-key="No">1</value>
     </property>
-    <property name="customFilter" display-name-key="Custom OData Filter" description-key="(optional) when searching for related records, use this odata $Filter expression to limit the searchable records (e.g. `statecode eq 0 and new_mycolumn eq false`)" of-type="SingleLine.Text" usage="input" required="false" />
-    <property name="labelMaxWidth" display-name-key="Label Max Width" description-key="(optional, default: 140px) sets a max width to the label display. Label display widths are variable, depending on deployed release of platform and region, so use this parameter to tweak widths if it does not align with your existing columns." of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="customFilter" display-name-key="Custom Filter" description-key="(optional) when searching for related records, use this odata $Filter expression to limit the searchable records (e.g. `statecode eq 0 and new_mycolumn eq false`)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="labelWidth" display-name-key="Label Width" description-key="(optional, default: 140px) sets a max width to the label display. Label display widths are variable, depending on deployed release of platform and region, so use this parameter to tweak widths if it does not align with your existing columns." of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="searchMode" display-name-key="Search Mode" description-key="Designates the search mode of the control. When set to Simple, the control does all filtering in memory, but only operates on the top 5k rows of the searched table. When set to Advanced, the control uses Dataverse Search to query for results as the user types." of-type="Enum" usage="input" required="false">
+      <value name="Simple" display-name-key="Yes">0</value>
+      <value name="Advanced" display-name-key="No">1</value>
+    </property>
+    <property name="matchWords" display-name-key="Match Terms" description-key="(optional, only applies when Advanced Search Mode is enabled) Designates the search term matching for multi-word search strings. All requires that results match ALL terms in the search string, any, allows results that match ANY of the terms" of-type="Enum" usage="input" required="false">
+      <value name="All Words" display-name-key="Yes">0</value>
+      <value name="Any Words" display-name-key="No">1</value>
+    </property>
+    <property name="bestEffort" display-name-key="Enable Best Effort Search" description-key="(optional, only applies when Advanced Search Mode is enabled) When True, allows Dataverse to return probable results when no good results are found otherwise" of-type="TwoOptions" usage="input" required="true" />
     <resources>
       <code path="index.ts" order="1"/>
       <platform-library name="React" version="16.8.6" />

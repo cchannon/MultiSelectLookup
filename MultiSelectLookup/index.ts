@@ -35,9 +35,12 @@ export class MultiSelectLookup implements ComponentFramework.ReactControl<IInput
             thisRecordId: (<any>context).page.entityId,
             relationshipName: context.parameters.relationship.raw!,
             labelLocation: context.parameters.labelLocation.raw === "0" ? "above" : "left",
-            labelMaxWidth: context.parameters.labelMaxWidth.raw??"",
+            labelWidth: context.parameters.labelWidth.raw??"",
             searchMode: "simple",
             filter: context.parameters.customFilter.raw,
+            bestEffort: false,
+            searchColumns: '',
+            matchWords: 'all',
          };
         return React.createElement(
             MultiselectWithTags, props
