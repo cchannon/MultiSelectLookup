@@ -35,7 +35,7 @@ export class SimpleSearchProvider extends SearchProvider {
     const res = await this.webApi
       .retrieveMultipleRecords(
         this.tableName,
-        `?$select=${this.primaryColumn},${this.tableName}id${this.filter ? '&?filter='.concat(this.filter) : ""}`
+        `?$select=${this.primaryColumn},${this.tableName}id${this.filter ? '&$filter='.concat(this.filter) : ""}`
       )
       .then(
         (response) => {
@@ -52,7 +52,7 @@ export class SimpleSearchProvider extends SearchProvider {
 
   search = async(query: string): Promise<ComponentFramework.WebApi.Entity[]> =>{
     let res = this.records.filter((record) => {
-      return record[this.primaryColumn].includes(query);
+      return (record[this.primaryColumn] as string).toLowerCase().includes(query.toLowerCase());
     });
     return res;
   }

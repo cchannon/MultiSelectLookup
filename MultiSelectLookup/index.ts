@@ -36,7 +36,7 @@ export class MultiSelectLookup implements ComponentFramework.ReactControl<IInput
             relationshipName: context.parameters.relationship.raw!,
             labelLocation: context.parameters.labelLocation.raw === "0" ? "above" : "left",
             labelWidth: context.parameters.labelWidth.raw??"",
-            searchMode: "simple",
+            searchMode: context.parameters.searchMode.raw == "0" ? "simple" : "advanced",
             filter: context.parameters.customFilter.raw,
             bestEffort: false,
             searchColumns: '',

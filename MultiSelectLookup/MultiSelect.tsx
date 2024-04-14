@@ -315,12 +315,9 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
   };
 
   return (
-    <FluentProvider theme={props.theme} style={{ width: "100%" }}>
-      <div
-        className={
-          props.labelLocation === "above" ? styles.root : styles.leftlabel
-        }
-      >
+    <FluentProvider theme={props.theme} style={{ width: "100%" }} className={
+      props.labelLocation === "above" ? styles.root : styles.leftlabel
+    }>
         <Label style={{ width: props.labelWidth ?? "140px", paddingTop: "5px" }}>
           {props.label}
         </Label>
@@ -362,7 +359,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
                 All {targetCollectionName ?? ""}
               </Text>
             )}
-            {options.length > 0 &&
+            {options && options.length > 0 &&
               options.map((option) => (
                 <Option key={option[targetPrimaryColumn]}>
                   {option[targetPrimaryColumn]}
@@ -430,7 +427,6 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
             // </div>
           ) : null}
         </div>
-      </div>
     </FluentProvider>
   );
 };
