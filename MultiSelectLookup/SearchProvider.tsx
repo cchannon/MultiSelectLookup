@@ -1,6 +1,6 @@
 export interface Entity {
   name: string;
-  filter?: any;
+  filter?: string;
   searchColumns?: string[];
 }
 
@@ -10,13 +10,15 @@ export class SearchProvider {
   webApi: ComponentFramework.WebApi;
   primaryColumn: string;
   filter: string | null;
+  order: string | null;
   
 
-  constructor(webApi: ComponentFramework.WebApi, tableName: string, primaryColumn: string, filter: string | null) {
+  constructor(webApi: ComponentFramework.WebApi, tableName: string, primaryColumn: string, filter: string | null, order: string | null) {
     this.webApi = webApi;
     this.tableName = tableName;
     this.primaryColumn = primaryColumn;
     this.filter = filter;
+    this.order = order;
   }
 
   initialResults = async () => {
@@ -35,7 +37,7 @@ export class SimpleSearchProvider extends SearchProvider {
     const res = await this.webApi
       .retrieveMultipleRecords(
         this.tableName,
-        `?$select=${this.primaryColumn},${this.tableName}id${this.filter ? '&$filter='.concat(this.filter) : ""}`
+        `?$select=${this.primaryColumn},${this.tableName}id${this.filter ? '&$filter='.concat(this.filter) : ""}${this.order ? '&$orderby='.concat(this.order) : ""}`
       )
       .then(
         (response) => {
@@ -64,8 +66,8 @@ export class AdvancedSearchProvider extends SearchProvider {
   clientURL: string;
   searchColumns: string[];
 
-  constructor(webApi: ComponentFramework.WebApi, tableName: string, primaryColumn: string, filter: string | null, searchColumns: string[] = [], bestEffort: boolean, matchWords: string, clientURL: string) {
-    super(webApi, tableName, primaryColumn, filter);
+  constructor(webApi: ComponentFramework.WebApi, tableName: string, primaryColumn: string, filter: string | null, order: string | null, searchColumns: string[] = [], bestEffort: boolean, matchWords: string, clientURL: string) {
+    super(webApi, tableName, primaryColumn, filter, order);
     this.bestEffort = bestEffort;
     this.matchWords = matchWords;
     this.clientURL = clientURL;
@@ -73,7 +75,8 @@ export class AdvancedSearchProvider extends SearchProvider {
   }
 
   initialResults = async(): Promise<ComponentFramework.WebApi.Entity[]> =>  {
-    let res = this.search("").then((results) => {
+    let simpleProvider = new SimpleSearchProvider(this.webApi, this.tableName, this.primaryColumn, this.filter, this.order);
+    let res = simpleProvider.initialResults().then((results) => {
       return results;
     });
     return res;
@@ -95,6 +98,7 @@ export class AdvancedSearchProvider extends SearchProvider {
         besteffortsearchenabled: this.bestEffort,
         searchmode: this.matchWords
       }),
+      orderby: this.order? JSON.stringify([this.order]) : undefined,
       count: true
     };
 

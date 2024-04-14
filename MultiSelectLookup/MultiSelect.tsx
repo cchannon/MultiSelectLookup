@@ -39,6 +39,7 @@ export interface IMultiSelectProps {
   labelLocation: "above" | "left";
   labelWidth: string | null;
   filter: string | null;
+  order: string | null;
   bestEffort: boolean;
   searchMode: "simple" | "advanced";
   matchWords: "all" | "any";
@@ -110,6 +111,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
         props.items.getTargetEntityType(), 
         targetPrimaryColumn, 
         props.filter, 
+        props.order,
         props.searchColumns.length > 0 ? props.searchColumns.split(",") : [], 
         props.bestEffort, 
         props.matchWords, 
@@ -120,7 +122,8 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
         props.webApi, 
         props.items.getTargetEntityType(), 
         targetPrimaryColumn, 
-        props.filter)
+        props.filter,
+        props.order)
       );
     }
   }, [props.searchMode, 
@@ -128,6 +131,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
       props.items, 
       targetPrimaryColumn, 
       props.filter, 
+      props.order,
       props.searchColumns, 
       props.bestEffort, 
       props.matchWords,
