@@ -128,9 +128,9 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
     }
   }, [props.searchMode, 
       props.webApi, 
-      props.items, 
+      props.items,
       targetPrimaryColumn, 
-      props.filter, 
+      props.filter,
       props.order,
       props.searchColumns, 
       props.bestEffort, 

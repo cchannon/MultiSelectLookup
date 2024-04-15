@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="ktcs" constructor="MultiSelectLookup" version="0.0.1" display-name-key="MultiSelectLookup" description-key="MultiSelectLookup description" control-type="virtual" >
+  <control namespace="ktcs" constructor="MultiSelectLookup" version="0.0.2" display-name-key="MultiSelectLookup" description-key="MultiSelectLookup description" control-type="virtual" >
     <external-service-usage enabled="false">
     </external-service-usage>
     <data-set name="dataset" display-name-key="dataset">
@@ -12,9 +12,9 @@
       <value name="Above" display-name-key="Yes">0</value>
       <value name="Beside" display-name-key="No">1</value>
     </property>
+    <property name="labelWidth" display-name-key="Label Width" description-key="(optional, default: 140px) sets a max width to the label display. Label display widths are variable, depending on deployed release of platform and region, so use this parameter to tweak widths if it does not align with your existing columns." of-type="SingleLine.Text" usage="input" required="false" />
     <property name="customFilter" display-name-key="Custom Filter" description-key="(optional) when searching for related records, use this odata $Filter expression to limit the searchable records (e.g. `statecode eq 0 and new_mycolumn eq false`)" of-type="SingleLine.Text" usage="input" required="false" />
     <property name="customOrder" display-name-key="Custom Order" description-key="(optional) when searching for related records, use this odata $Order expression to sort the records (e.g. `modifiedon desc`). If not set, defaults to Relevance ranking of results rather than any one column" of-type="SingleLine.Text" usage="input" required="false" />
-    <property name="labelWidth" display-name-key="Label Width" description-key="(optional, default: 140px) sets a max width to the label display. Label display widths are variable, depending on deployed release of platform and region, so use this parameter to tweak widths if it does not align with your existing columns." of-type="SingleLine.Text" usage="input" required="false" />
     <property name="searchMode" display-name-key="Search Mode" description-key="Designates the search mode of the control. When set to Simple, the control does all filtering in memory, but only operates on the top 5k rows of the searched table. When set to Advanced, the control uses Dataverse Search to query for results as the user types." of-type="Enum" usage="input" required="false">
       <value name="Simple" display-name-key="Yes">0</value>
       <value name="Advanced" display-name-key="No">1</value>
