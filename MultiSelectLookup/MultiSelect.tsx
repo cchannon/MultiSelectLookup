@@ -105,7 +105,7 @@ export const MultiselectWithTags: React.FC<IMultiSelectProps> = (
 
   // init search provider
   React.useEffect(() => {
-    if(props.searchMode === "advanced" && props.webApi && props.items && props.clientURL) {
+    if(props.searchMode === "advanced" && props.webApi && props.items && props.clientURL && targetPrimaryColumn) {
       setSearchProvider(new AdvancedSearchProvider(
         props.webApi, 
         props.items.getTargetEntityType(), 

@@ -116,7 +116,7 @@ export class AdvancedSearchProvider extends SearchProvider {
       .then(response => response.json())
       .then(data => {
         let results = JSON.parse(data.response).Value.map((record: any) => {
-          return record.Highlights.name[0];
+          return record.Attributes;
         });
         return (results);
       })
@@ -125,6 +125,6 @@ export class AdvancedSearchProvider extends SearchProvider {
         console.error('Error:', error);
       });
     
-      return res;
+      return res as ComponentFramework.WebApi.Entity[];
   }
 }
